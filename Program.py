@@ -10,10 +10,6 @@ def ConfigureProgram():
 
 
 class Program(object):
-    '''Class implementing a canonical genetic program as described in
-    the first CSCI 6506 sandbox, ie. consisting of ONLY the +, -, * and /
-    operators and used ofr binary or multiclass classification.
-    '''
 
     ADDITION_OP                = 0
     SUBTRACTION_OP             = 1
