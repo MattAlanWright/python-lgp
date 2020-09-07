@@ -1,0 +1,5 @@
+# Python artifacts
+__pycache__/
+
+# Saved agents
+*.agent
