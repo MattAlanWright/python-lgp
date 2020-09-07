@@ -40,3 +40,9 @@ class Learner:
 
     def save(self, name):
         pickle.dump(self, open(name + ".agent", 'wb'))
+
+
+# Load a saved Learner structure
+def loadLearner(fname):
+    learner = pickle.load(open(fname, 'rb'))
+    return learner

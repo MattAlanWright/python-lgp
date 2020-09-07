@@ -87,8 +87,8 @@ class Trainer:
         """Evaluate a Learner over some number of episodes in a given environment 'env'
         """
 
-        # Skip agents that have already been evaluated, up to MAX_EVAL_SKIPS times
-        if learner.fitness is not None and Trainer.FAST_MODE:
+        # Skip agents that have already been evaluated, up to MAX_NUM_SKIPS times
+        if learner.fitness is not None:
             if learner.num_skips < Trainer.MAX_NUM_SKIPS:
                 learner.num_skips += 1
                 return
