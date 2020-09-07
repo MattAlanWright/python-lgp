@@ -1,3 +1,3 @@
-# PyGP
+# python-lgp  
 
-Python implementation of a genetic program. This was done as part of a graduate course on genetic programming at Dalhousie University.
+Python implementation of a linear genetic programming agent. So far this is built specifically for playing CartPole
