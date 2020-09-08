@@ -6,17 +6,12 @@ from Program import Program
 class Learner:
 
     def __init__(self):
-        # Initialize a random Program
         self.program = Program()
-
         self.reset()
 
-    
-    def reset(self):
-        # Learners are assigned a fitness during evolution
-        self.fitness = None
 
-        # Number of times a Learner has skipped fitness re-evaluation
+    def reset(self):
+        self.fitness = None
         self.num_skips = 0
 
 

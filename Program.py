@@ -25,7 +25,6 @@ class Program(object):
     MAX_RESULT                 = np.finfo(np.float32).max
     DEFAULT_OP_RESULT          = np.float32(0.0)
 
-    # Instruction configuration
     MODE_INDEX                 = 0
     TARGET_INDEX               = 1
     OP_CODE_INDEX              = 2
@@ -36,7 +35,6 @@ class Program(object):
     INPUT_MODE                 = 1
     NUM_MODES                  = 2
 
-    # Behaviour configuration
     NUM_REGISTERS               = 8
     NUM_INPUTS                  = 4
     MAX_SOURCE_INDEX            = max(8, 4) # This should be the max of the number of registers and the input size
@@ -76,7 +74,6 @@ class Program(object):
 
 
     def printInstructions(self):
-        '''Print out instructions in a readable format.'''
         for instruction in self._instructions:
             self.printInstruction(instruction)
 
@@ -110,7 +107,7 @@ class Program(object):
 
     def cleanResult(self, result):
         '''The result of instruction execution may be NaN, inf, or -inf. This function
-        cleans the resulting value to ensure that it is a valid np.float32 value
+        cleans the resulting value to ensure that it is a valid np.float32 value.
         '''
 
         result = np.float32(result)
@@ -125,28 +122,31 @@ class Program(object):
 
 
     def execute(self, state):
-        '''Execute the program's instructions using the current state as input'''
         for instruction in self._instructions:
             self.executeInstruction(instruction, state)
 
 
     def executeInstruction(self, instruction, state):
+        '''Deconstruct components out of the instruction and perform the
+        operation.
 
-        # Extract instruction values
+        mode:       Indicates whether the source operand is a register or state value
+        target:     Destination register and operand
+        source:     Register or state value oeprand
+        op_code:    Operation to perform
+        '''
+
         mode, target_index, op_code, source_index = instruction
 
-        # Perform modulo in case we are indexing into the smaller range
-        source_index = source_index % self._source_mod_value[mode]
-
-        # Retrieve source and target values
         target = self.registers[target_index]
+
         source = None
+        source_index = source_index % self._source_mod_value[mode]
         if mode == Program.REGISTER_MODE:
             source = self.registers[source_index]
         else:
             source = state[source_index]
 
-        # Switch on operation and execute
         result = 0
         if op_code == Program.ADDITION_OP:
             result = target + source
@@ -189,7 +189,6 @@ class Program(object):
         instruction_index = np.random.randint(0, len(self._instructions))
         component_index   = np.random.randint(0, Program.NUM_INSTRUCTION_COMPONENTS)
 
-        # Figure out which component is being modified and set the upper bound on the RNG.
         upper_bound = None
         if component_index == Program.MODE_INDEX:
             upper_bound = Program.NUM_MODES
