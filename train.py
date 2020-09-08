@@ -10,6 +10,7 @@
 import gym
 import numpy as np
 
+from Program import ConfigureProgram
 from Trainer import Trainer
 
 import os
@@ -17,14 +18,14 @@ import sys
 import argparse
 
 def run(arguments):
-    if len(arguments) == 0:
-        print("ERROR - No arguments given to main")
-        sys.exit(0)
 
     # Setup the command line parsing to read the environment title
-    parser = argparse.ArgumentParser(description='Perform TPG evolution for a given environment.')
+    parser = argparse.ArgumentParser(description='Perform linear GP evolution for a given environment.')
     parser.add_argument('--env', dest='env', type=str, help='OpenAI environment', default="CartPole-v1")
+    parser.add_argument('--statespace', dest='statespace', type=int, help='Length of flattened state space', default=4)
     args = parser.parse_args(arguments)
+
+    ConfigureProgram(num_inputs=args.statespace)
 
     # Get environment details
     env = gym.make(args.env)

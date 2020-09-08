@@ -4,9 +4,25 @@ import pickle
 
 from utils import weightedCoinFlip
 
+def ConfigureProgram(
+    num_inputs      = 4,
+    mutation_rate   = 0.20,
+    min_prog_size   = 32,
+    max_prog_size   = 1024,
+    p_add           = 0.7,
+    p_del           = 0.7,
+    p_mut           = 0.7):
 
-def ConfigureProgram():
-    Program.MAX_SOURCE_INDEX = max(Program.NUM_REGISTERS, Program.NUM_INPUTS)
+    Program.NUM_INPUTS                  = num_inputs
+    Program.MAX_SOURCE_INDEX            = max(Program.NUM_REGISTERS, Program.NUM_INPUTS)
+    Program.MUTATION_RATE               = mutation_rate
+
+    Program.MIN_PROG_SIZE               = min_prog_size
+    Program.MAX_PROG_SIZE               = max_prog_size
+
+    Program.P_ADD                       = p_add
+    Program.P_DEL                       = p_del
+    Program.P_MUT                       = p_mut
 
 
 class Program(object):
@@ -45,7 +61,7 @@ class Program(object):
 
     P_ADD                       = 0.7
     P_DEL                       = 0.7
-    P_MUT                       = 0.8
+    P_MUT                       = 0.7
 
     def __init__(self):
 

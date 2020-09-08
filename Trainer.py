@@ -80,7 +80,7 @@ class Trainer:
 
 
     def evaluateLearner(self, learner):
-    '''Evaluate a Learner over some number of episodes in a given environment '''
+        '''Evaluate a Learner over some number of episodes in a given environment'''
 
         # Skip agents that have already been evaluated, up to MAX_NUM_SKIPS times
         if learner.fitness is not None:
