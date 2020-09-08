@@ -62,12 +62,11 @@ class Program(object):
 
     def __init__(self):
 
-        # Pre-calculate mod value depending on source access mode
+        # Index-able modulo values
         self._source_mod_value = [0, 0]
         self._source_mod_value[Program.INPUT_MODE]    = Program.NUM_INPUTS
         self._source_mod_value[Program.REGISTER_MODE] = Program.NUM_REGISTERS
 
-        # Allocate space for registers
         self.registers = np.zeros(Program.NUM_REGISTERS)
 
         # Initialize random instructions.
@@ -140,8 +139,7 @@ class Program(object):
 
 
     def executeInstruction(self, instruction, state):
-        '''Deconstruct components out of the instruction and perform the
-        operation.
+        '''Deconstruct components out of the instruction and perform the operation.
 
         mode:       Indicates whether the source operand is a register or state value
         target:     Destination register and operand
