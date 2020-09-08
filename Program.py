@@ -6,7 +6,6 @@ from utils import weightedCoinFlip
 
 def ConfigureProgram(
     num_inputs      = 4,
-    mutation_rate   = 0.20,
     min_prog_size   = 32,
     max_prog_size   = 1024,
     p_add           = 0.7,
@@ -15,7 +14,6 @@ def ConfigureProgram(
 
     Program.NUM_INPUTS                  = num_inputs
     Program.MAX_SOURCE_INDEX            = max(Program.NUM_REGISTERS, Program.NUM_INPUTS)
-    Program.MUTATION_RATE               = mutation_rate
 
     Program.MIN_PROG_SIZE               = min_prog_size
     Program.MAX_PROG_SIZE               = max_prog_size
@@ -54,7 +52,6 @@ class Program(object):
     NUM_REGISTERS               = 8
     NUM_INPUTS                  = 4
     MAX_SOURCE_INDEX            = max(8, 4) # This should be the max of the number of registers and the input size
-    MUTATION_RATE               = 0.20
 
     MIN_PROG_SIZE               = 32
     MAX_PROG_SIZE               = 1024
