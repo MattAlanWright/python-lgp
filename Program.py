@@ -11,7 +11,25 @@ def ConfigureProgram(
     p_add           = 0.7,
     p_del           = 0.7,
     p_mut           = 0.7):
+    
+    # Safe-guard against nonsense arguments
+    if min_prog_size >= max_prog_size:
+        print("ConfigureProgram - ERROR - min_prog_size ({}) > max_prog_size ({}) - Setting to 32 and 1024 respectively.".format(min_prog_size, max_prog_size))
+        min_prog_size = 32
+        max_prog_size = 1024
+        
+    if p_add < 0.0 or p_add > 1.0:
+        print("Invalid p_add {}, setting to 0.7".format(p_add))
+        p_add = 0.7
 
+    if p_del < 0.0 or p_del > 1.0:
+        print("Invalid p_del {}, setting to 0.7".format(p_del))
+        p_del = 0.7
+        
+    if p_mut < 0.0 or p_mut > 1.0:
+        print("Invalid p_mut {}, setting to 0.7".format(p_mut))
+        p_mut = 0.7
+        
     Program.NUM_INPUTS                  = num_inputs
     Program.MAX_SOURCE_INDEX            = max(Program.NUM_REGISTERS, Program.NUM_INPUTS)
 
