@@ -3,6 +3,31 @@ from copy import deepcopy
 
 from Learner import Learner
 
+def ConfigureTrainer(
+    num_generations     = 20,
+    population_size     = 100,
+    percent_keep        = 0.3,
+    fast_mode           = True,
+    max_num_skips       = 3,
+    num_eps_per_gen     = 5,
+    verbose             = True,
+    env_seed            = -1,
+    agent_save_name     = ""):
+    
+    if percent_keep < 0.1 or percent_keep > 0.9:
+        print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
+        percent_keep = 0.3
+        
+    Trainer.NUM_GENERATION          = num_generations
+    Trainer.POPULATION_SIZE         = population_size
+    Trainer.PERCENT_KEEP            = percent_keep
+    Trainer.FAST_MODE               = fast_mode
+    Trainer.MAX_NUM_SKIPS           = max_num_skips
+    Trainer.NUM_EPISODES_PER_GEN    = num_eps_per_gen
+    Trainer.VERBOSE                 = verbose
+    Trainer.ENV_SEED                = env_seed
+    Trainer.AGENT_SAVE_NAME         = agent_save_name
+
 class Trainer:
 
     NUM_GENERATIONS         = 100
@@ -13,7 +38,7 @@ class Trainer:
     NUM_EPISODES_PER_GEN    = 5
     VERBOSE                 = True
     ENV_SEED                = -1
-    AGENT_SAVE_NAME         = "top"
+    AGENT_SAVE_NAME         = ""
 
     def __init__(self, env):
 
