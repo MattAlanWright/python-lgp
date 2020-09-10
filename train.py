@@ -11,7 +11,7 @@ import gym
 import numpy as np
 
 from Program import ConfigureProgram
-from Trainer import Trainer
+from Trainer import ConfigureTrainer, Trainer
 
 import os
 import sys
@@ -20,14 +20,14 @@ import argparse
 def run(arguments):
 
     parser = argparse.ArgumentParser(description='Perform linear GP evolution for a given environment.')
-    
+
     # Program configuration
     parser.add_argument('--minps', dest='min_prog_size', type=int, help='Minimum number of instructions per Program', default=32)
     parser.add_argument('--maxps', dest='max_prog_size', type=int, help='Maximum number of instructions per Program', default=1024)
     parser.add_argument('--padd', dest='padd', type=float, help='Instruction addition strength', default=0.7)
     parser.add_argument('--pdel', dest='pdel', type=float, help='Instruction deletion strength', default=0.7)
     parser.add_argument('--pmut', dest='pmut', type=float, help='Instruction mutation strength', default=0.7)
-    
+
     # Trainer configuration
     parser.add_argument('--generations', dest='num_generations', type=int, help='Number of generations over which evolution is performed', default=50)
     parser.add_argument('--pop', dest='population_size', type=int, help='Learner population size', default=200)
@@ -37,16 +37,16 @@ def run(arguments):
     parser.add_argument('--episodes', dest='num_eps_per_gen', type=int, help='Number of episodes over which an agent is evaluated each generation', default=3)
     parser.add_argument('--verbose', dest='verbose', type=bool, help='Do print out info to the console during evolution', default=True)
     parser.add_argument('--agent', dest='agent_save_name', type=str, help='Name under which to save the evolved agent', default="")
-    
+
     # Environment configuration
     parser.add_argument('--env', dest='env', type=str, help='OpenAI environment', default="CartPole-v1")
     parser.add_argument('--statespace', dest='statespace', type=int, help='Length of flattened state space', default=4)
     args = parser.parse_args(arguments)
-    
-    if args.env != "CartPole-v0" && args.env != "CartPole-v1":
+
+    if args.env != "CartPole-v0" and args.env != "CartPole-v1":
         print("Woops! So far this module only works in the CartPole environment!")
         return
-    
+
     if args.statespace != 4:
         print("Woops! So far this module only works in the CartPole environment with a statespace size of 4!")
         return
@@ -61,12 +61,12 @@ def run(arguments):
 
     ConfigureTrainer(
         num_generations     = args.num_generations,
-        population_size     = args.poulation_size,
+        population_size     = args.population_size,
         percent_keep        = args.percent_keep,
         fast_mode           = args.fast_mode,
         max_num_skips       = args.num_skips,
         num_eps_per_gen     = args.num_eps_per_gen,
-        verbose             = args.verbose,,
+        verbose             = args.verbose,
         agent_save_name     = args.agent_save_name)
 
     env = gym.make(args.env)
@@ -75,4 +75,3 @@ def run(arguments):
 
 if __name__ == "__main__":
     run(sys.argv[1:])
-    
