@@ -20,6 +20,11 @@ import argparse
 def run(arguments):
 
     parser = argparse.ArgumentParser(description='Perform linear GP evolution for a given environment.')
+    parser.add_argument('--minps', dest='min_prog_size', type=int, help='Minimum number of instructions per Program', default=32)
+    parser.add_argument('--maxps', dest='max_prog_size', type=int, help='Maximum number of instructions per Program', default=1024)
+    parser.add_argument('--padd', dest='padd', type=int, help='Instruction addition strength', default=0.7)
+    parser.add_argument('--pdel', dest='pdel', type=int, help='Instruction deletion strength', default=0.7)
+    parser.add_argument('--pmut', dest='pmut', type=int, help='Instruction mutation strength', default=0.7)
     parser.add_argument('--env', dest='env', type=str, help='OpenAI environment', default="CartPole-v1")
     parser.add_argument('--statespace', dest='statespace', type=int, help='Length of flattened state space', default=4)
     args = parser.parse_args(arguments)
@@ -32,7 +37,13 @@ def run(arguments):
         print("Woops! So far this module only works in the CartPole environment with a statespace size of 4!")
         return
 
-    ConfigureProgram(num_inputs=args.statespace)
+    ConfigureProgram(
+        num_inputs      = args.statespace,
+        min_prog_size   = args.min_prog_size,
+        max_prog_size   = args.max_prog_size,
+        p_add           = args.padd,
+        p_del           = args.pdel,
+        p_mut           = args.pmut)
 
     env = gym.make(args.env)
     trainer = Trainer(env)
