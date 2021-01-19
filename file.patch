@@ -1,0 +1,96 @@
+Only in lgp-original/: file.patch
+Only in lgp-original/: .git
+Only in python-lgp-multi-core/: __pycache__
+diff -ur lgp-original/Trainer.py python-lgp-multi-core/Trainer.py
+--- lgp-original/Trainer.py	2021-01-19 12:16:33.600058557 -0400
++++ python-lgp-multi-core/Trainer.py	2020-11-04 23:56:06.496929000 -0400
+@@ -1,7 +1,10 @@
+ import numpy as np
++import gym
+ from copy import deepcopy
+-
++import multiprocessing as mp
++from multiprocessing import Manager
+ from Learner import Learner
++from functools import partial
+ 
+ def ConfigureTrainer(
+     num_generations     = 20,
+@@ -87,18 +90,28 @@
+             # Add the learner to the population
+             self.learner_pop.append(l_prime)
+ 
++    # Function used to handle multiple processes
++    def ev(i, learner, self, s, l):
++        # Evaluate the agent in the current task/environment
++        self.evaluateLearner(learner)
++        s.append(learner.fitness)
++        l.append(learner)
++
+ 
+     def evaluation(self):
+         '''Measures the fitness of all Learners in the population.'''
+-
+-        scores = []
+-
+-        for _, learner in enumerate(self.learner_pop):
+-
+-            # Evaluate the agent in the current task/environment
+-            self.evaluateLearner(learner)
+-            scores.append(learner.fitness)
+-
++        
++        # Shared Memory
++        scores = Manager().list()
++        learners = Manager().list()
++
++        # Pool of process matching number of cpus
++        p = mp.Pool()
++        part = partial(self.ev, self=self, s=scores, l=learners)
++        p.map(part, self.learner_pop)
++        # Copy back data after all learners are done
++        self.learner_pop = learners
++        
+         if Trainer.VERBOSE:
+             print("    Average score this generation:", int(np.mean(scores)))
+             print("    Top score this generation:", int(np.max(scores)))
+@@ -117,13 +130,15 @@
+ 
+         # Track scores across episodes
+         scores = []
++        # Each thread gets its own instance of the gym
++        e = gym.make(self.env)
+ 
+         for ep in range(Trainer.NUM_EPISODES_PER_GEN):
+ 
+             # Reset the score and environment for this episode
+             if Trainer.ENV_SEED >= 0:
+-                self.env.seed(Trainer.ENV_SEED)
+-            state = self.env.reset()
++                e.seed(Trainer.ENV_SEED)
++            state = e.reset()
+             score = 0
+ 
+             # Play out the episode
+@@ -131,7 +146,7 @@
+             while not done:
+ 
+                 action = learner.act(state.reshape(-1))
+-                state, reward, done, debug = self.env.step(action)
++                state, reward, done, debug = e.step(action)
+                 score += reward
+ 
+             scores.append(score)
+diff -ur lgp-original/train.py python-lgp-multi-core/train.py
+--- lgp-original/train.py	2021-01-19 12:16:33.600058557 -0400
++++ python-lgp-multi-core/train.py	2020-11-04 23:56:00.003595000 -0400
+@@ -69,8 +69,7 @@
+         verbose             = args.verbose,
+         agent_save_name     = args.agent_save_name)
+ 
+-    env = gym.make(args.env)
+-    trainer = Trainer(env)
++    trainer = Trainer(args.env)
+     trainer.evolve()
+ 
+ if __name__ == "__main__":
