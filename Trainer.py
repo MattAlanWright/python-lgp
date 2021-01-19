@@ -12,7 +12,8 @@ def ConfigureTrainer(
     num_eps_per_gen     = 5,
     verbose             = True,
     env_seed            = -1,
-    agent_save_name     = ""):
+    agent_save_name     = "",
+    multi_element       = False):
     
     if percent_keep < 0.1 or percent_keep > 0.9:
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
@@ -27,6 +28,7 @@ def ConfigureTrainer(
     Trainer.VERBOSE                 = verbose
     Trainer.ENV_SEED                = env_seed
     Trainer.AGENT_SAVE_NAME         = agent_save_name
+    Trainer.MULTI_ELEMENT           = multi_element
 
 class Trainer:
 
@@ -39,6 +41,7 @@ class Trainer:
     VERBOSE                 = True
     ENV_SEED                = -1
     AGENT_SAVE_NAME         = ""
+    MULTI_ELEMENT             = False
 
     def __init__(self, env):
 
@@ -128,12 +131,18 @@ class Trainer:
 
             # Play out the episode
             done = False
+            # For copy task run each column as a step
+            # Then run the same number of times for the output
             while not done:
 
                 action = learner.act(state.reshape(-1))
+                #if (self.MULTI_ELEMENT == False):
+                #    action = action[0]
+
                 state, reward, done, debug = self.env.step(action)
                 score += reward
 
+            print("Score", score)
             scores.append(score)
 
         learner.fitness = np.mean(scores)

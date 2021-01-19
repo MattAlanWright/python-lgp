@@ -1,4 +1,5 @@
-from utils import sigmoid
+from utils import roundedSigmoid
+import numpy as np
 import pickle
 
 from Program import Program
@@ -21,12 +22,15 @@ class Learner:
         #       and rounded to either 0 or 1, the two valid
         #       actions for the CartPole environment. This does
         #       not generalize to other environments!!
+        # UPDATE: I appended to the function to allow for 
+        #       multiple elements. It is still limited
         self.program.execute(state)
 
-        r0 = self.program.registers[0]
-        action = int(round(sigmoid(r0)))
+        action = self.program.registers
+        sig = np.vectorize(roundedSigmoid)
+        result = sig(action)
 
-        return action
+        return result
 
 
     def mutate(self):

@@ -10,6 +10,8 @@
 import gym
 import numpy as np
 
+from CopyTask import CopyTask
+
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
 
@@ -69,7 +71,9 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name)
 
-    env = gym.make(args.env)
+    env = CopyTask()
+    print(env.step)
+    #env = gym.make(args.env)
     trainer = Trainer(env)
     trainer.evolve()
 
