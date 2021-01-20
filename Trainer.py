@@ -19,7 +19,7 @@ def ConfigureTrainer(
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
         percent_keep = 0.3
         
-    Trainer.NUM_GENERATION          = num_generations
+    Trainer.NUM_GENERATIONS          = num_generations
     Trainer.POPULATION_SIZE         = population_size
     Trainer.PERCENT_KEEP            = percent_keep
     Trainer.FAST_MODE               = fast_mode
@@ -55,7 +55,6 @@ class Trainer:
 
 
     def evolve(self):
-
         for i in range(Trainer.NUM_GENERATIONS):
 
             print("Generation {}".format(i))
