@@ -69,10 +69,11 @@ def run(arguments):
         max_num_skips       = args.num_skips,
         num_eps_per_gen     = args.num_eps_per_gen,
         verbose             = args.verbose,
-        agent_save_name     = args.agent_save_name)
+        agent_save_name     = args.agent_save_name,
+        # REQUIRED FOR COPY TASK
+        multi_element       = True)
 
-    env = CopyTask()
-    print(env.step)
+    env = CopyTask(2,2)
     #env = gym.make(args.env)
     trainer = Trainer(env)
     trainer.evolve()

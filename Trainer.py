@@ -136,13 +136,13 @@ class Trainer:
             while not done:
 
                 action = learner.act(state.reshape(-1))
-                #if (self.MULTI_ELEMENT == False):
-                #    action = action[0]
+                if (self.MULTI_ELEMENT == False):
+                    action = action[0]
 
                 state, reward, done, debug = self.env.step(action)
                 score += reward
 
-            print("Score", score)
+            #print("Score", score)
             scores.append(score)
 
         learner.fitness = np.mean(scores)

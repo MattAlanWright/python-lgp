@@ -3,3 +3,6 @@ __pycache__/
 
 # Saved agents
 *.agent
+
+# Saved outputs
+outputs/
