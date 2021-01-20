@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+import time
 
 from Learner import Learner
 
@@ -41,7 +42,8 @@ class Trainer:
     VERBOSE                 = True
     ENV_SEED                = -1
     AGENT_SAVE_NAME         = ""
-    MULTI_ELEMENT             = False
+    MULTI_ELEMENT           = False
+    UNIQUE_FILE             = "{}_output.txt".format(int(time.time()))
 
     def __init__(self, env):
 
@@ -53,11 +55,15 @@ class Trainer:
             l = Learner()
             self.learner_pop.append(l)
 
+    def write_output(self, content):
+        print(content)
+        with open(self.UNIQUE_FILE, "a") as output:
+            output.write(content)
+            output.write("\n")
 
     def evolve(self):
         for i in range(Trainer.NUM_GENERATIONS):
-
-            print("Generation {}".format(i))
+            self.write_output("Generation {}".format(i))
 
             # Generate Learners to fill the population
             self.generation()
@@ -102,9 +108,8 @@ class Trainer:
             scores.append(learner.fitness)
 
         if Trainer.VERBOSE:
-            print("    Average score this generation:", int(np.mean(scores)))
-            print("    Top score this generation:", int(np.max(scores)))
-
+            self.write_output("    Average score this generation: {}".format(int(np.mean(scores))))
+            self.write_output("    Top score this generation: {}".format(int(np.max(scores))))
 
     def evaluateLearner(self, learner):
         '''Evaluate a Learner over some number of episodes in a given environment'''
