@@ -73,7 +73,7 @@ def run(arguments):
         # REQUIRED FOR COPY TASK
         multi_element       = True)
 
-    env = CopyTask(2,2)
+    env = CopyTask(8,8)
     #env = gym.make(args.env)
     trainer = Trainer(env)
     trainer.evolve()

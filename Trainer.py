@@ -146,7 +146,6 @@ class Trainer:
                 state, reward, done, debug = self.env.step(action)
                 score += reward
 
-            #print("Score", score)
             scores.append(score)
 
         learner.fitness = np.mean(scores)
