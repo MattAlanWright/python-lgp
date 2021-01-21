@@ -55,7 +55,7 @@ class Program(object):
     
     NUM_OP_CODES               = 8
 
-    OP_SYMBOLS                 = ['+', '-', '*', '/', 'cos', '?']
+    OP_SYMBOLS                 = ['+', '-', '*', '/', 'cos', '?', 'PUSH', 'POP']
 
     MIN_RESULT                 = np.finfo(np.float32).min
     MAX_RESULT                 = np.finfo(np.float32).max
