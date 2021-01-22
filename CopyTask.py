@@ -10,6 +10,7 @@ class CopyTask:
         self.columns = sequences+2
         self.resetInput()
         self.lastStep = self.columns+sequences-1
+        self.memory = []
 
     def resetInput(self):
         rows = self.rows

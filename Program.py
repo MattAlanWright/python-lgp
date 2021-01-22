@@ -49,13 +49,9 @@ class Program(object):
     DIVISION_OP                = 3
     COS_OP                     = 4
     CONDITIONAL_OP             = 5
-    
-    PUSH_OP                    = 6
-    POP_OP                     = 7
-    
-    NUM_OP_CODES               = 8
+    NUM_OP_CODES               = 6
 
-    OP_SYMBOLS                 = ['+', '-', '*', '/', 'cos', '?', 'PUSH', 'POP']
+    OP_SYMBOLS                 = ['+', '-', '*', '/', 'cos', '?']
 
     MIN_RESULT                 = np.finfo(np.float32).min
     MAX_RESULT                 = np.finfo(np.float32).max
@@ -90,8 +86,6 @@ class Program(object):
         self._source_mod_value[Program.REGISTER_MODE] = Program.NUM_REGISTERS
 
         self.registers = np.zeros(Program.NUM_REGISTERS)
-
-        self.stack_memory = []
 
         # Initialize random instructions.
         self._instructions = []
@@ -201,13 +195,6 @@ class Program(object):
         elif op_code == Program.CONDITIONAL_OP:
             if target < source:
                 result = -target
-
-        elif op_code == Program.PUSH_OP:
-            self.stack_memory.append(source)
-
-        elif op_code == Program.POP_OP:
-            if self.stack_memory:
-                result = self.stack_memory.pop()
 
         result = self.cleanResult(result)
 
