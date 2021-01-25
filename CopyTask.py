@@ -11,6 +11,7 @@ class CopyTask:
         self.resetInput()
         self.lastStep = self.columns+sequences-1
         self.memory = []
+        self.stdio = []
 
     def resetInput(self):
         rows = self.rows
@@ -25,6 +26,7 @@ class CopyTask:
         self.input[columns-1][1] = 1
         # Slice off padding for comparing
         self.output = self.input[1:len(self.input)-1,2:]
+        self.output = self.output[::-1]
 
     def seed(self, num):
         print("Seed")
@@ -34,6 +36,8 @@ class CopyTask:
     def reset(self):
         self.resetInput()
         self.current_step = 0
+        self.stdio = []
+        self.memory = []
         return self.input
 
     def step(self, action):
@@ -44,14 +48,35 @@ class CopyTask:
         # Give data for given column of step
         if (self.current_step < self.columns):
             input = self.input[self.current_step]
+            # Only increase score if push happens in valid area
+            # this excludes the columns where the delimiters occur
+            if (action and self.current_step != 0 and self.current_step != self.columns-1):
+                score += 1
+            elif (not action and (self.current_step == 0 or self.current_step == self.columns-1)):
+                score += 1
+            else:
+                score -= 1
         else:
             input = np.array([0] * self.rows)
             mod_step = (self.current_step-2)%len(self.output)
-            if (len(action) < len(self.output[mod_step])):
-                print("ERROR: Register space smaller then element size")
-                sys.exit()
+            # Preform pop if action is 0
+            if (not action and self.memory):
+                pop = self.memory.pop()
+                self.stdio.append(pop)
+                score += 1
             else:
-                score += np.sum(self.output[mod_step] == action[:len(self.output[mod_step])])
+                score -= 1
+            # Check for final state
+            if (np.all(self.stdio == self.output)):
+                print("Perfect Pop and Push:")
+                print(self.stdio, self.output)
+                # Optionally quit
+                # quit()
+                score += 1
+
+        # Push to memory if action is set
+        if (action):
+            self.memory.append(input[2:])
 
         # Set to done on last step
         done = False
