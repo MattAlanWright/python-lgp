@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+import time
 
 from Learner import Learner
 
@@ -18,7 +19,7 @@ def ConfigureTrainer(
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
         percent_keep = 0.3
         
-    Trainer.NUM_GENERATION          = num_generations
+    Trainer.NUM_GENERATIONS          = num_generations
     Trainer.POPULATION_SIZE         = population_size
     Trainer.PERCENT_KEEP            = percent_keep
     Trainer.FAST_MODE               = fast_mode
@@ -39,6 +40,8 @@ class Trainer:
     VERBOSE                 = True
     ENV_SEED                = -1
     AGENT_SAVE_NAME         = ""
+    MULTI_ELEMENT           = False
+    UNIQUE_FILE             = "{}_output.txt".format(int(time.time()))
 
     def __init__(self, env):
 
@@ -50,12 +53,15 @@ class Trainer:
             l = Learner()
             self.learner_pop.append(l)
 
+    def write_output(self, content):
+        print(content)
+        with open(self.UNIQUE_FILE, "a") as output:
+            output.write(content)
+            output.write("\n")
 
     def evolve(self):
-
         for i in range(Trainer.NUM_GENERATIONS):
-
-            print("Generation {}".format(i))
+            self.write_output("Generation {}".format(i))
 
             # Generate Learners to fill the population
             self.generation()
@@ -100,9 +106,8 @@ class Trainer:
             scores.append(learner.fitness)
 
         if Trainer.VERBOSE:
-            print("    Average score this generation:", int(np.mean(scores)))
-            print("    Top score this generation:", int(np.max(scores)))
-
+            self.write_output("    Average score this generation: {}".format(int(np.mean(scores))))
+            self.write_output("    Top score this generation: {}".format(int(np.max(scores))))
 
     def evaluateLearner(self, learner):
         '''Evaluate a Learner over some number of episodes in a given environment'''
@@ -128,9 +133,12 @@ class Trainer:
 
             # Play out the episode
             done = False
+            # For copy task run each column as a step
+            # Then run the same number of times for the output
             while not done:
 
                 action = learner.act(state.reshape(-1))
+
                 state, reward, done, debug = self.env.step(action)
                 score += reward
 
