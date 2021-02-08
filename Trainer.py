@@ -49,19 +49,20 @@ class Trainer:
 
         self.env = env
 
+        self.write_output("Generation,Average Score,Top Score,Successes\n")
+
         for i in range(Trainer.POPULATION_SIZE):
             l = Learner()
             self.learner_pop.append(l)
 
     def write_output(self, content):
-        print(content)
+        print(content, end="")
         with open(self.UNIQUE_FILE, "a") as output:
             output.write(content)
-            output.write("\n")
 
     def evolve(self):
         for i in range(Trainer.NUM_GENERATIONS):
-            self.write_output("Generation {}".format(i))
+            self.write_output("{},".format(i))
 
             # Generate Learners to fill the population
             self.generation()
@@ -98,16 +99,17 @@ class Trainer:
         '''Measures the fitness of all Learners in the population.'''
 
         scores = []
+        successes = 0
 
         for _, learner in enumerate(self.learner_pop):
 
             # Evaluate the agent in the current task/environment
             self.evaluateLearner(learner)
             scores.append(learner.fitness)
+            successes += learner.successes
 
         if Trainer.VERBOSE:
-            self.write_output("    Average score this generation: {}".format(int(np.mean(scores))))
-            self.write_output("    Top score this generation: {}".format(int(np.max(scores))))
+            self.write_output("{},{},{}\n".format(int(np.mean(scores)),int(np.max(scores)),successes))
 
     def evaluateLearner(self, learner):
         '''Evaluate a Learner over some number of episodes in a given environment'''
@@ -130,6 +132,7 @@ class Trainer:
                 self.env.seed(Trainer.ENV_SEED)
             state = self.env.reset()
             score = 0
+            successes = 0
 
             # Play out the episode
             done = False
@@ -139,11 +142,13 @@ class Trainer:
 
                 action = learner.act(state.reshape(-1))
 
-                state, reward, done, debug = self.env.step(action)
+                state, reward, done, debug, success = self.env.step(action)
+                if (success):
+                    successes += 1
                 score += reward
-
             scores.append(score)
 
+        learner.successes = successes
         learner.fitness = np.mean(scores)
 
 

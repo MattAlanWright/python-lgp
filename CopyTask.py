@@ -1,19 +1,28 @@
 from numpy import random
+import random as rand
 import sys
 import numpy as np
 
 class CopyTask:
     def __init__(self, elements = 3, sequences = 5):
+        self.elements = elements
+        self.sequences = sequences
         self.current_step = 0
-        # Handle Start/Delimiter
-        self.rows = elements+2
-        self.columns = sequences+2
         self.resetInput()
-        self.lastStep = self.columns+sequences-1
         self.memory = []
         self.stdio = []
 
     def resetInput(self):
+        # Randomize sizes using given numbers as max
+        elements = rand.randint(3, self.elements)
+        sequences = rand.randint(3, self.sequences)
+
+        # Handle Start/Delimiter
+        self.rows = elements+2
+        self.columns = sequences+2
+        self.lastStep = self.columns+sequences-1
+
+        # Generate formatted random sequence
         rows = self.rows
         columns = self.columns
         self.input = random.randint(2, size=(rows, columns))
@@ -41,6 +50,7 @@ class CopyTask:
         return self.input
 
     def step(self, action):
+        success = False
         score = 0
         # There are two different steps
         # Inputting steps
@@ -68,8 +78,8 @@ class CopyTask:
                 score -= 1
             # Check for final state
             if (np.all(self.stdio == self.output)):
-                print("Perfect Pop and Push:")
-                print(self.stdio, self.output)
+                success = True
+                # print(self.stdio, self.output)
                 # Optionally quit
                 # quit()
                 score += 1
@@ -85,4 +95,4 @@ class CopyTask:
 
         self.current_step += 1
 
-        return input, score, done, "N/A"
+        return input, score, done, "N/A", success
