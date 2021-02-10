@@ -41,7 +41,7 @@ class Trainer:
     ENV_SEED                = -1
     AGENT_SAVE_NAME         = ""
     MULTI_ELEMENT           = False
-    UNIQUE_FILE             = "{}_output.txt".format(int(time.time()))
+    UNIQUE_FILE             = "outputs/{}_output.csv".format(int(time.time()))
 
     def __init__(self, env):
 
@@ -106,10 +106,10 @@ class Trainer:
             # Evaluate the agent in the current task/environment
             self.evaluateLearner(learner)
             scores.append(learner.fitness)
-            successes += learner.successes
+            successes += learner.successes/len(self.learner_pop)
 
         if Trainer.VERBOSE:
-            self.write_output("{},{},{}\n".format(int(np.mean(scores)),int(np.max(scores)),successes))
+            self.write_output("{},{},{}\n".format(np.mean(scores),np.max(scores),successes))
 
     def evaluateLearner(self, learner):
         '''Evaluate a Learner over some number of episodes in a given environment'''
@@ -131,8 +131,8 @@ class Trainer:
             if Trainer.ENV_SEED >= 0:
                 self.env.seed(Trainer.ENV_SEED)
             state = self.env.reset()
-            score = 0
-            successes = 0
+            score = 0.0
+            successes = 0.0
 
             # Play out the episode
             done = False
@@ -142,13 +142,13 @@ class Trainer:
 
                 action = learner.act(state.reshape(-1))
 
-                state, reward, done, debug, success = self.env.step(action)
-                if (success):
-                    successes += 1
+                state, reward, done, debug = self.env.step(action)
                 score += reward
+                if (score >= 0.999999999):
+                    successes += 1
             scores.append(score)
 
-        learner.successes = successes
+        learner.successes = successes/Trainer.NUM_EPISODES_PER_GEN
         learner.fitness = np.mean(scores)
 
 

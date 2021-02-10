@@ -20,7 +20,9 @@ class CopyTask:
         # Handle Start/Delimiter
         self.rows = elements+2
         self.columns = sequences+2
+        
         self.lastStep = self.columns+sequences-1
+        self.topScore = self.columns+sequences-1
 
         # Generate formatted random sequence
         rows = self.rows
@@ -33,6 +35,7 @@ class CopyTask:
         self.input[columns-1] = [0] * rows
         self.input[0][0] = 1
         self.input[columns-1][1] = 1
+
         # Slice off padding for comparing
         self.output = self.input[1:len(self.input)-1,2:]
         self.output = self.output[::-1]
@@ -44,10 +47,10 @@ class CopyTask:
 
     def reset(self):
         self.resetInput()
-        self.current_step = 0
+        self.current_step = 1
         self.stdio = []
         self.memory = []
-        return self.input
+        return self.input[0]
 
     def step(self, action):
         success = False
@@ -60,9 +63,9 @@ class CopyTask:
             input = self.input[self.current_step]
             # Only increase score if push happens in valid area
             # this excludes the columns where the delimiters occur
-            if (action and self.current_step != 0 and self.current_step != self.columns-1):
+            if (action[0] and self.current_step != 0 and self.current_step != self.columns-1):
                 score += 1
-            elif (not action and (self.current_step == 0 or self.current_step == self.columns-1)):
+            elif (not action[0] and (self.current_step == 0 or self.current_step == self.columns-1)):
                 score += 1
             else:
                 score -= 1
@@ -70,22 +73,19 @@ class CopyTask:
             input = np.array([0] * self.rows)
             mod_step = (self.current_step-2)%len(self.output)
             # Preform pop if action is 0
-            if (not action and self.memory):
+            if (action[1] and self.memory):
                 pop = self.memory.pop()
                 self.stdio.append(pop)
                 score += 1
             else:
                 score -= 1
-            # Check for final state
-            if (np.all(self.stdio == self.output)):
-                success = True
-                # print(self.stdio, self.output)
-                # Optionally quit
-                # quit()
-                score += 1
+            # Check array
+            #if (np.all(self.stdio == self.output)):
+                #print(self.stdio, self.output)
+                #quit()
 
         # Push to memory if action is set
-        if (action):
+        if (action[0]):
             self.memory.append(input[2:])
 
         # Set to done on last step
@@ -94,5 +94,4 @@ class CopyTask:
             done = True
 
         self.current_step += 1
-
-        return input, score, done, "N/A", success
+        return input, score/self.topScore, done, "N/A"
