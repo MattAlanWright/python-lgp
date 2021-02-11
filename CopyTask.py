@@ -16,12 +16,12 @@ class CopyTask:
         # Randomize sizes using given numbers as max
         elements = rand.randint(3, self.elements)
         sequences = rand.randint(3, self.sequences)
-
+    
         # Handle Start/Delimiter
         self.rows = elements+2
         self.columns = sequences+2
         
-        self.numSteps = self.columns+sequences-1
+        self.numSteps = self.columns+sequences
 
         # Generate formatted random sequence
         rows = self.rows
@@ -88,10 +88,9 @@ class CopyTask:
 
         # Set to done on last step
         done = False
-        if (self.current_step >= self.numSteps):
+        if (self.current_step >= self.numSteps-1):
             done = True
 
         # Increment current step
         self.current_step += 1
-
         return input, score/self.numSteps, done, "N/A"
