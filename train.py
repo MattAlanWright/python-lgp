@@ -69,8 +69,7 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name)
 
-    env = gym.make(args.env)
-    trainer = Trainer(env)
+    trainer = Trainer(args.env)
     trainer.evolve()
 
 if __name__ == "__main__":

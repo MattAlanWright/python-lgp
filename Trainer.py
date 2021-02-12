@@ -1,7 +1,10 @@
 import numpy as np
+import gym
 from copy import deepcopy
-
+import multiprocessing as mp
+from multiprocessing import Manager
 from Learner import Learner
+from functools import partial
 
 def ConfigureTrainer(
     num_generations     = 20,
@@ -87,18 +90,28 @@ class Trainer:
             # Add the learner to the population
             self.learner_pop.append(l_prime)
 
+    # Function used to handle multiple processes
+    def ev(i, learner, self, s, l):
+        # Evaluate the agent in the current task/environment
+        self.evaluateLearner(learner)
+        s.append(learner.fitness)
+        l.append(learner)
+
 
     def evaluation(self):
         '''Measures the fitness of all Learners in the population.'''
+        
+        # Shared Memory
+        scores = Manager().list()
+        learners = Manager().list()
 
-        scores = []
-
-        for _, learner in enumerate(self.learner_pop):
-
-            # Evaluate the agent in the current task/environment
-            self.evaluateLearner(learner)
-            scores.append(learner.fitness)
-
+        # Pool of process matching number of cpus
+        p = mp.Pool()
+        part = partial(self.ev, self=self, s=scores, l=learners)
+        p.map(part, self.learner_pop)
+        # Copy back data after all learners are done
+        self.learner_pop = learners
+        
         if Trainer.VERBOSE:
             print("    Average score this generation:", int(np.mean(scores)))
             print("    Top score this generation:", int(np.max(scores)))
@@ -117,13 +130,15 @@ class Trainer:
 
         # Track scores across episodes
         scores = []
+        # Each thread gets its own instance of the gym
+        e = gym.make(self.env)
 
         for ep in range(Trainer.NUM_EPISODES_PER_GEN):
 
             # Reset the score and environment for this episode
             if Trainer.ENV_SEED >= 0:
-                self.env.seed(Trainer.ENV_SEED)
-            state = self.env.reset()
+                e.seed(Trainer.ENV_SEED)
+            state = e.reset()
             score = 0
 
             # Play out the episode
@@ -131,7 +146,7 @@ class Trainer:
             while not done:
 
                 action = learner.act(state.reshape(-1))
-                state, reward, done, debug = self.env.step(action)
+                state, reward, done, debug = e.step(action)
                 score += reward
 
             scores.append(score)
