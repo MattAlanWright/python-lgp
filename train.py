@@ -11,6 +11,7 @@ import gym
 import numpy as np
 
 from CopyTask import CopyTask
+from TMaze import TMaze
 
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
@@ -53,6 +54,9 @@ def run(arguments):
         print("Woops! So far this module only works in the CartPole environment with a statespace size of 4!")
         return
 
+    # For TMaze
+    args.statespace = 2
+
     ConfigureProgram(
         num_inputs      = args.statespace,
         min_prog_size   = args.min_prog_size,
@@ -71,7 +75,8 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name)
 
-    env = CopyTask(8,8)
+    env = TMaze()
+    #env = CopyTask(8,8)
     #env = gym.make(args.env)
     trainer = Trainer(env)
     trainer.evolve()
