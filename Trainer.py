@@ -43,13 +43,14 @@ class Trainer:
     MULTI_ELEMENT           = False
     UNIQUE_FILE             = "outputs/{}_output.csv".format(int(time.time()))
 
-    def __init__(self, env):
+    def __init__(self, env, test_env = False):
 
         self.learner_pop = []
 
         self.env = env
-
-        self.write_output("Generation,Average Score,Top Score,Successes\n")
+        self.test_env = test_env
+        if Trainer.VERBOSE:
+            self.write_output("Generation,Average Score,Top Score,Successes\n")
 
         for i in range(Trainer.POPULATION_SIZE):
             l = Learner()
@@ -73,6 +74,10 @@ class Trainer:
             # Select the fittest Learners
             self.selection()
 
+        # Testing the fittest Learners
+        if (self.test_env):
+            self.evaluation(True)
+
 
     def generation(self):
         num_old_learners = len(self.learner_pop)
@@ -84,7 +89,7 @@ class Trainer:
 
             # Make a deep copy of the Learner (copy structures, not references)
             l_prime = deepcopy(l)
-
+ 
             # Reset new Learner's fitness and num_skips
             l_prime.reset()
 
@@ -95,7 +100,7 @@ class Trainer:
             self.learner_pop.append(l_prime)
 
 
-    def evaluation(self):
+    def evaluation(self, test_set = False):
         '''Measures the fitness of all Learners in the population.'''
 
         scores = []
@@ -104,16 +109,24 @@ class Trainer:
         for _, learner in enumerate(self.learner_pop):
 
             # Evaluate the agent in the current task/environment
-            self.evaluateLearner(learner)
+            self.evaluateLearner(learner, test_set)
             scores.append(learner.fitness)
             successes += learner.successes/len(self.learner_pop)
 
-        if Trainer.VERBOSE:
+        if (test_set):
+            self.write_output("\n----------\nTest Set Results:\n----------\n")
+
+        if (Trainer.VERBOSE):
             self.write_output("{},{},{}\n".format(np.mean(scores),np.max(scores),successes))
 
-    def evaluateLearner(self, learner):
+    def evaluateLearner(self, learner, test_set):
         '''Evaluate a Learner over some number of episodes in a given environment'''
-
+        # Handle Test Set
+        if (test_set):
+            env = self.test_env
+        else:
+            env = self.env
+            
         # Skip agents that have already been evaluated, up to MAX_NUM_SKIPS times
         if learner.fitness is not None:
             if learner.num_skips < Trainer.MAX_NUM_SKIPS:
@@ -129,8 +142,8 @@ class Trainer:
 
             # Reset the score and environment for this episode
             if Trainer.ENV_SEED >= 0:
-                self.env.seed(Trainer.ENV_SEED)
-            state = self.env.reset()
+                env.seed(Trainer.ENV_SEED)
+            state = env.reset()
             score = 0.0
             successes = 0.0
 
@@ -142,7 +155,7 @@ class Trainer:
 
                 action = learner.act(state.reshape(-1))
 
-                state, reward, done, debug = self.env.step(action)
+                state, reward, done, debug = env.step(action)
                 score += reward
                 if (score >= 0.999999999):
                     successes += 1

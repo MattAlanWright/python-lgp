@@ -76,9 +76,10 @@ def run(arguments):
         agent_save_name     = args.agent_save_name)
 
     env = TMaze()
+    test_env = TMaze(100)
     #env = CopyTask(8,8)
     #env = gym.make(args.env)
-    trainer = Trainer(env)
+    trainer = Trainer(env, test_env)
     trainer.evolve()
 
 if __name__ == "__main__":
