@@ -22,9 +22,9 @@ class TMaze:
 
     def compareAction(self, action):
         if (self.action == 1):
-            return action[0]
+            return action[0] and not action[1]
         else:
-            return action[1]
+            return action[1] and not action[0]
 
     def step(self, action):
         result = self.compareAction(action)
