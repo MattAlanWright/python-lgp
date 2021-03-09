@@ -22,12 +22,12 @@ class SeqClassing:
             self.input.append(j)
             for k in range(rand.randint(10, 20)):
                 self.input.append(0)
+        self.input_len = len(self.input)
         return np.array([self.input[0]])
 
     def step(self, action):
-        pos = self.input[:self.curr_step-1].count(1)
-        neg = self.input[:self.curr_step-1].count(-1)
-        result_input = pos >= neg
+        s = sum(self.input[:self.curr_step-1])
+        result_input = s >= 0
         score = 0
         done = 0
         value = 0
@@ -39,10 +39,10 @@ class SeqClassing:
         else:
             score -= 1
 
-        if self.curr_step == len(self.input):
+        if self.curr_step == self.input_len:
             done = 1
         else:
             value = self.input[self.curr_step]
             self.curr_step += 1
 
-        return np.array([value]), score/len(self.input), done, "N/A"
+        return np.array([value]), score/self.input_len, done, "N/A"
