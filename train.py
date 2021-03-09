@@ -12,6 +12,7 @@ import numpy as np
 
 from CopyTask import CopyTask
 from TMaze import TMaze
+from SeqClassing import SeqClassing
 
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
@@ -55,7 +56,7 @@ def run(arguments):
         return
 
     # For TMaze
-    args.statespace = 2
+    args.statespace = 1
 
     ConfigureProgram(
         num_inputs      = args.statespace,
@@ -75,11 +76,13 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name)
 
-    env = TMaze()
-    test_env = TMaze(100)
+    env = SeqClassing()
+    #env = TMaze()
+    #test_env = TMaze(100)
+
     #env = CopyTask(8,8)
     #env = gym.make(args.env)
-    trainer = Trainer(env, test_env)
+    trainer = Trainer(env)
     trainer.evolve()
 
 if __name__ == "__main__":
