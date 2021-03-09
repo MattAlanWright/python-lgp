@@ -1,5 +1,4 @@
-from numpy import random
-import random as rand
+import random
 import sys
 import numpy as np
 
@@ -16,11 +15,11 @@ class SeqClassing:
     def reset(self):
         self.input = []
         self.curr_step = 1
-        for i in range(rand.randint(3, 10)):
+        for i in range(int(random.random() * 11)+3):
             # https://stackoverflow.com/a/46820635
             j = 1 if random.random() < 0.5 else -1
             self.input.append(j)
-            for k in range(rand.randint(10, 20)):
+            for k in range(int(random.random()*21)+10):
                 self.input.append(0)
         self.input_len = len(self.input)
         return np.array([self.input[0]])
