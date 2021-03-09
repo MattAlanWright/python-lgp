@@ -32,9 +32,9 @@ class SeqClassing:
         done = 0
         value = 0
 
-        if (result_input and action[0]):
+        if (result_input and action[0] and not action[1]):
             score += 1
-        elif (not result_input and action[1]):
+        elif (not result_input and action[1] and not action[0]):
             score += 1
         else:
             score -= 1
