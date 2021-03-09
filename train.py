@@ -55,7 +55,8 @@ def run(arguments):
         print("Woops! So far this module only works in the CartPole environment with a statespace size of 4!")
         return
 
-    # For TMaze
+    # For TMaze 2
+    # For Seq 1
     args.statespace = 1
 
     ConfigureProgram(

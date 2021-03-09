@@ -1,4 +1,5 @@
 import random
+import fastrand
 import sys
 import numpy as np
 
@@ -10,17 +11,17 @@ class SeqClassing:
     def seed(self, num):
         print("Seed")
         print(num)
+        fastrand.pcg32_seed(num)
         random.seed(num)
 
     def reset(self):
         self.input = []
         self.curr_step = 1
-        for i in range(int(random.random() * 11)+3):
+        num_of_ones = fastrand.pcg32bounded(7)+3
+        for i in range(num_of_ones):
             # https://stackoverflow.com/a/46820635
-            j = 1 if random.random() < 0.5 else -1
-            self.input.append(j)
-            for k in range(int(random.random()*21)+10):
-                self.input.append(0)
+            self.input += [1 if random.random() < 0.5 else -1]
+            self.input += [0]*(fastrand.pcg32bounded(10)+10)
         self.input_len = len(self.input)
         return np.array([self.input[0]])
 
