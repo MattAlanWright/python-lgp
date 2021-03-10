@@ -57,7 +57,7 @@ def run(arguments):
 
     # For TMaze 2
     # For Seq 1
-    args.statespace = 1
+    args.statespace = 2
 
     ConfigureProgram(
         num_inputs      = args.statespace,
@@ -75,10 +75,12 @@ def run(arguments):
         max_num_skips       = args.num_skips,
         num_eps_per_gen     = args.num_eps_per_gen,
         verbose             = args.verbose,
-        agent_save_name     = args.agent_save_name)
+        agent_save_name     = args.agent_save_name,
+        output_folder       = "../lgp-outputs/",
+        env_name            = "tmaze")
 
-    env = SeqClassing()
-    #env = TMaze()
+    #env = SeqClassing()
+    env = TMaze()
     #test_env = TMaze(100)
 
     #env = CopyTask(8,8)

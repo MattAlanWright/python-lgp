@@ -13,7 +13,9 @@ def ConfigureTrainer(
     num_eps_per_gen     = 5,
     verbose             = True,
     env_seed            = -1,
-    agent_save_name     = ""):
+    agent_save_name     = "",
+    output_folder       = "outputs/",
+    env_name            = "output"):
     
     if percent_keep < 0.1 or percent_keep > 0.9:
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
@@ -28,6 +30,8 @@ def ConfigureTrainer(
     Trainer.VERBOSE                 = verbose
     Trainer.ENV_SEED                = env_seed
     Trainer.AGENT_SAVE_NAME         = agent_save_name
+    Trainer.OUTPUT_FOLDER           = output_folder
+    Trainer.ENV_NAME                = env_name
 
 class Trainer:
 
@@ -41,7 +45,9 @@ class Trainer:
     ENV_SEED                = -1
     AGENT_SAVE_NAME         = ""
     MULTI_ELEMENT           = False
-    UNIQUE_FILE             = "outputs/{}_output.csv".format(int(time.time()))
+    OUTPUT_FOLDER           = "outputs/"
+    ENV_NAME                = "output"
+    CURRENT_TIME            = int(time.time())
 
     def __init__(self, env, test_env = False):
 
@@ -58,7 +64,7 @@ class Trainer:
 
     def write_output(self, content):
         print(content, end="")
-        with open(self.UNIQUE_FILE, "a") as output:
+        with open(self.OUTPUT_FOLDER+str(self.CURRENT_TIME)+"_"+self.ENV_NAME+".csv", "a") as output:
             output.write(content)
 
     def evolve(self):
