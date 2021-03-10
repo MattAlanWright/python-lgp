@@ -1,5 +1,5 @@
 from numpy import random
-import random as rand
+import fastrand
 import sys
 import numpy as np
 
@@ -12,12 +12,13 @@ class TMaze:
     def seed(self, num):
         print("Seed")
         print(num)
+        fastrand.pcg32_seed(num)
         random.seed(num)
 
     def reset(self):
         # https://stackoverflow.com/a/46820635
         self.action = 1 if random.random() < 0.5 else -1
-        self.count = rand.randint(1, self.N)
+        self.count = fastrand.pcg32bounded(self.N)+1
         return np.array([self.action, self.count])
 
     def compareAction(self, action):
