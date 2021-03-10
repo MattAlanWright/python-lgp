@@ -22,6 +22,7 @@ class SeqClassing:
             # https://stackoverflow.com/a/46820635
             self.input += [1 if random.random() < 0.5 else -1]
             self.input += [0]*(fastrand.pcg32bounded(10)+10)
+        self.input += [1 if random.random() < 0.5 else -1]
         self.input_len = len(self.input)
         return np.array([self.input[0]])
 
