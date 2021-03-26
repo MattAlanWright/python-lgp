@@ -62,14 +62,14 @@ class SeqRecall:
             count = self.count
             self.count -= 1
         elif (self.curr_step > (self.input_len + self.count) and selected_action == 3):
-            score += 1
+            score += 1 # Dequeue 
         else:
-            score -= 1
+            score -= 1 # Invalid Setting
 
         if self.curr_step == self.num_steps:
             done = 1 # End
         elif self.curr_step < self.input_len:
-            value = self.input[self.curr_step]
+            value = self.input[self.curr_step] # Give Input
             self.curr_step += 1
         else:
             self.curr_step += 1
