@@ -25,7 +25,8 @@ class Learner:
 
         r0 = self.program.registers[0]
         r1 = self.program.registers[1]
-        action = [int(round(sigmoid(r0))),int(round(sigmoid(r1)))]
+        r2 = self.program.registers[2]
+        action = [int(round(sigmoid(r0))),int(round(sigmoid(r1))),int(round(sigmoid(r2)))]
 
         return action
 

@@ -13,6 +13,7 @@ import numpy as np
 from CopyTask import CopyTask
 from TMaze import TMaze
 from SeqClassing import SeqClassing
+from SeqRecall import SeqRecall
 
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
@@ -57,6 +58,7 @@ def run(arguments):
 
     # For TMaze 2
     # For Seq 1
+    # For SeqRecall 2
     args.statespace = 2
 
     ConfigureProgram(
@@ -77,10 +79,11 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name,
         output_folder       = "../lgp-outputs/",
-        env_name            = "tmaze")
+        env_name            = "seqrecall")
 
+    env = SeqRecall()
     #env = SeqClassing()
-    env = TMaze()
+    #env = TMaze()
     #test_env = TMaze(100)
 
     #env = CopyTask(8,8)
