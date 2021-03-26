@@ -4,8 +4,9 @@ import sys
 import numpy as np
 
 class SeqClassing:
-    def __init__(self):
+    def __init__(self, n = 7):
         # Set init input
+        self.N = n
         self.reset()
 
     def seed(self, num):
@@ -17,7 +18,7 @@ class SeqClassing:
     def reset(self):
         self.input = []
         self.curr_step = 1
-        num_of_ones = fastrand.pcg32bounded(7)+3
+        num_of_ones = fastrand.pcg32bounded(self.N)+3
         for i in range(num_of_ones):
             # https://stackoverflow.com/a/46820635
             self.input += [1 if random.random() < 0.5 else -1]
