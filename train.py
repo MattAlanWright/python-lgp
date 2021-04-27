@@ -48,18 +48,28 @@ def run(arguments):
     parser.add_argument('--statespace', dest='statespace', type=int, help='Length of flattened state space', default=4)
     args = parser.parse_args(arguments)
 
-    if args.env != "CartPole-v0" and args.env != "CartPole-v1":
-        print("Woops! So far this module only works in the CartPole environment!")
+    # Default CartPole
+    # env = gym.make(args.env)
+    # Current functioning tasks
+    if args.env == "copytask":
+        env = CopyTask(8,8)
+    elif args.env == "tmaze":
+        args.statespace = 2
+        env = TMaze()
+        test_env = TMaze(100)
+    elif args.env == "seqrecall":
+        env = SeqRecall()
+        args.statespace = 1
+    elif args.env == "seqclass":
+        args.statespace = 1
+        env = SeqClassing()
+    elif args.env == "seqclassconst":
+        args.statespace = 1
+        env = SeqClassing(7)
+    else:
+        print("Please state an environment/task:")
+        print("copytask,tmaze,seqrecall,seqclass,seqclassconst")
         return
-
-    if args.statespace != 4:
-        print("Woops! So far this module only works in the CartPole environment with a statespace size of 4!")
-        return
-
-    # For TMaze 2
-    # For Seq 1
-    # For SeqRecall 2
-    args.statespace = 2
 
     ConfigureProgram(
         num_inputs      = args.statespace,
@@ -79,15 +89,8 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name,
         output_folder       = "../lgp-outputs/",
-        env_name            = "seqrecall")
+        env_name            = args.env)
 
-    env = SeqRecall()
-    #env = SeqClassing()
-    #env = TMaze()
-    #test_env = TMaze(100)
-
-    #env = CopyTask(8,8)
-    #env = gym.make(args.env)
     trainer = Trainer(env)
     trainer.evolve()
 
