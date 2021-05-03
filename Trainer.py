@@ -135,7 +135,6 @@ class Trainer:
             self.write_output("{},{},{}\n".format(np.mean(scores),np.max(scores),successes))
 
     def fitnessSharingEvaluation(self):
-        print("Fitness Sharing")
         collectedScores = []
         env = self.env
         for ep in range(Trainer.NUM_EPISODES_PER_GEN):
@@ -145,7 +144,6 @@ class Trainer:
             scores = []
             successes = []
             for _, learner in enumerate(self.learner_pop):
-                # TODO Add restart command to all task
                 state = env.restart()
                 score, success = self.evaluateOnce(learner, state, env)
                 scores.append(score)
@@ -157,8 +155,10 @@ class Trainer:
                 if learner.fitness is None:
                     learner.fitness = 0
                 learner.fitness += 1 if scores[idx] >= meanScore else 0
+            # TODO record number successfully completed tasks
             # successes /= Trainer.NUM_EPISODES_PER_GEN
-        return collectedScores.mean(axis=1), "N/A"
+
+        return np.mean(collectedScores, axis=1), "N/A"
 
     def evaluateOnce(self, learner, state, env):
         score = 0.0
