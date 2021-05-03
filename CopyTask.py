@@ -44,6 +44,12 @@ class CopyTask:
         print(num)
         random.seed(num)
 
+    def restart(self):
+        self.current_step = 0
+        self.stdio = []
+        self.memory = []
+        return self.input[0]
+
     def reset(self):
         self.resetInput()
         self.current_step = 0

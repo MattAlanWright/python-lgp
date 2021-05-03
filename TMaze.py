@@ -15,10 +15,15 @@ class TMaze:
         fastrand.pcg32_seed(num)
         random.seed(num)
 
+    def restart(self):
+        self.count = self.initCount
+        return np.array([self.action, self.count])
+
     def reset(self):
         # https://stackoverflow.com/a/46820635
         self.action = 1 if random.random() < 0.5 else -1
-        self.count = fastrand.pcg32bounded(self.N)+1
+        self.initCount = fastrand.pcg32bounded(self.N)+1
+        self.count = self.initCount
         return np.array([self.action, self.count])
 
     def compareAction(self, action):

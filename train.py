@@ -42,6 +42,7 @@ def run(arguments):
     parser.add_argument('--episodes', dest='num_eps_per_gen', type=int, help='Number of episodes over which an agent is evaluated each generation', default=3)
     parser.add_argument('--verbose', dest='verbose', type=bool, help='Do print out info to the console during evolution', default=True)
     parser.add_argument('--agent', dest='agent_save_name', type=str, help='Name under which to save the evolved agent', default="")
+    parser.add_argument('--fitness_sharing', dest='fitness_sharing', type=bool, help='Use fitness sharing to evaluate learners', default=False)
 
     # Environment configuration
     parser.add_argument('--env', dest='env', type=str, help='OpenAI environment', default="CartPole-v1")
@@ -89,7 +90,8 @@ def run(arguments):
         verbose             = args.verbose,
         agent_save_name     = args.agent_save_name,
         output_folder       = "../lgp-outputs/",
-        env_name            = args.env)
+        env_name            = args.env,
+        fitness_sharing     = args.fitness_sharing)
 
     trainer = Trainer(env)
     trainer.evolve()

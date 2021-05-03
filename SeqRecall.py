@@ -21,8 +21,14 @@ class SeqRecall:
         fastrand.pcg32_seed(num)
         random.seed(num)
 
+    def restart(self):
+        self.count = self.initCount
+        self.curr_step = 1
+        return np.array([self.input[0], 0])
+
     def reset(self):
-        self.count = fastrand.pcg32bounded(self.count_n)+1
+        self.initCount = fastrand.pcg32bounded(self.count_n)+1
+        self.count = self.initCount
         self.input = []
         for i in range(self.seq_n):
             # https://stackoverflow.com/a/46820635

@@ -15,6 +15,10 @@ class SeqClassing:
         fastrand.pcg32_seed(num)
         random.seed(num)
 
+    def restart(self):
+        self.curr_step = 1
+        return np.array([self.input[0]])
+
     def reset(self):
         self.input = []
         self.curr_step = 1

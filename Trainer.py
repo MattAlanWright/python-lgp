@@ -15,7 +15,8 @@ def ConfigureTrainer(
     env_seed            = -1,
     agent_save_name     = "",
     output_folder       = "outputs/",
-    env_name            = "output"):
+    env_name            = "output",
+    fitness_sharing     = False):
     
     if percent_keep < 0.1 or percent_keep > 0.9:
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
@@ -32,6 +33,7 @@ def ConfigureTrainer(
     Trainer.AGENT_SAVE_NAME         = agent_save_name
     Trainer.OUTPUT_FOLDER           = output_folder
     Trainer.ENV_NAME                = env_name
+    Trainer.FITNESS_SHARING         = fitness_sharing
 
 class Trainer:
 
@@ -48,10 +50,14 @@ class Trainer:
     OUTPUT_FOLDER           = "outputs/"
     ENV_NAME                = "output"
     CURRENT_TIME            = int(time.time())
+    FITNESS_SHARING         = False
 
     def __init__(self, env, test_env = False):
 
         self.learner_pop = []
+
+        if (test_env and Trainer.FITNESS_SHARING):
+            print("WARNING: Test environment not used in conjunction with fitness sharing")
 
         self.env = env
         self.test_env = test_env
@@ -112,18 +118,60 @@ class Trainer:
         scores = []
         successes = 0
 
-        for _, learner in enumerate(self.learner_pop):
+        if (Trainer.FITNESS_SHARING):
+            scores, successes = self.fitnessSharingEvaluation()
+        else:
+            for _, learner in enumerate(self.learner_pop):
 
-            # Evaluate the agent in the current task/environment
-            self.evaluateLearner(learner, test_set)
-            scores.append(learner.fitness)
-            successes += learner.successes/len(self.learner_pop)
+                # Evaluate the agent in the current task/environment
+                self.evaluateLearner(learner, test_set)
+                scores.append(learner.fitness)
+                successes += learner.successes/len(self.learner_pop)
 
-        if (test_set):
-            self.write_output("\n----------\nTest Set Results:\n----------\n")
+            if (test_set):
+                self.write_output("\n----------\nTest Set Results:\n----------\n")
 
         if (Trainer.VERBOSE):
             self.write_output("{},{},{}\n".format(np.mean(scores),np.max(scores),successes))
+
+    def fitnessSharingEvaluation(self):
+        print("Fitness Sharing")
+        collectedScores = []
+        env = self.env
+        for ep in range(Trainer.NUM_EPISODES_PER_GEN):
+            if Trainer.ENV_SEED >= 0:
+                env.seed(Trainer.ENV_SEED)
+            state = env.reset()
+            scores = []
+            successes = []
+            for _, learner in enumerate(self.learner_pop):
+                # TODO Add restart command to all task
+                state = env.restart()
+                score, success = self.evaluateOnce(learner, state, env)
+                scores.append(score)
+                successes.append(score)
+
+            meanScore = np.mean(scores)
+            collectedScores.append(scores)
+            for idx, learner in enumerate(self.learner_pop):
+                if learner.fitness is None:
+                    learner.fitness = 0
+                learner.fitness += 1 if scores[idx] >= meanScore else 0
+            # successes /= Trainer.NUM_EPISODES_PER_GEN
+        return collectedScores.mean(axis=1), "N/A"
+
+    def evaluateOnce(self, learner, state, env):
+        score = 0.0
+        success = 0.0
+        # Play out the episode
+        done = False
+        while not done:
+            action = learner.act(state.reshape(-1))
+            state, reward, done, debug = env.step(action)
+            score += reward
+        if (score >= 0.999999999):
+            success += 1
+        return score, success
 
     def evaluateLearner(self, learner, test_set):
         '''Evaluate a Learner over some number of episodes in a given environment'''
@@ -132,7 +180,7 @@ class Trainer:
             env = self.test_env
         else:
             env = self.env
-            
+
         # Skip agents that have already been evaluated, up to MAX_NUM_SKIPS times
         if learner.fitness is not None:
             if learner.num_skips < Trainer.MAX_NUM_SKIPS:
@@ -143,6 +191,7 @@ class Trainer:
 
         # Track scores across episodes
         scores = []
+        successes = 0.0
 
         for ep in range(Trainer.NUM_EPISODES_PER_GEN):
 
@@ -150,22 +199,10 @@ class Trainer:
             if Trainer.ENV_SEED >= 0:
                 env.seed(Trainer.ENV_SEED)
             state = env.reset()
-            score = 0.0
-            successes = 0.0
 
-            # Play out the episode
-            done = False
-            # For copy task run each column as a step
-            # Then run the same number of times for the output
-            while not done:
-
-                action = learner.act(state.reshape(-1))
-
-                state, reward, done, debug = env.step(action)
-                score += reward
-                if (score >= 0.999999999):
-                    successes += 1
+            score, success = self.evaluateOnce(learner, state, env)
             scores.append(score)
+            successes += success
 
         learner.successes = successes/Trainer.NUM_EPISODES_PER_GEN
         learner.fitness = np.mean(scores)
