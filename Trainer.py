@@ -150,11 +150,21 @@ class Trainer:
                 successes.append(score)
 
             meanScore = np.mean(scores)
-            collectedScores.append(scores)
+            binaryScores = []
+            totalScore = 1
+            for value in scores:
+                binaryValue = 1 if value >= meanScore else 0
+                binaryScores.append(binaryValue)
+                totalScore += binaryValue
+
+            normalizedScores = []
             for idx, learner in enumerate(self.learner_pop):
                 if learner.fitness is None:
                     learner.fitness = 0
-                learner.fitness += 1 if scores[idx] >= meanScore else 0
+                learner.fitness = binaryScores[idx]/totalScore
+                normalizedScores.append(binaryScores[idx]/totalScore)
+            collectedScores.append(normalizedScores)
+
             # TODO record number successfully completed tasks
             # successes /= Trainer.NUM_EPISODES_PER_GEN
 
