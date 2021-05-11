@@ -70,7 +70,11 @@ class Trainer:
 
     def write_output(self, content):
         print(content, end="")
-        with open(self.OUTPUT_FOLDER+str(self.CURRENT_TIME)+"_"+self.ENV_NAME+".csv", "a") as output:
+        fitness_algo = "canonical"
+        if (Trainer.FITNESS_SHARING):
+            fitness_algo = "fitness_sharing"
+        name = str(self.CURRENT_TIME)+"_"+self.ENV_NAME+"_"+fitness_algo+"_pop_"+str(Trainer.POPULATION_SIZE)+".csv"
+        with open(self.OUTPUT_FOLDER+name, "a") as output:
             output.write(content)
 
     def evolve(self):
@@ -150,6 +154,7 @@ class Trainer:
                 successes.append(score)
 
             meanScore = np.mean(scores)
+            collectedScores.append(scores)
             binaryScores = []
             totalScore = 1
             for value in scores:
@@ -161,9 +166,8 @@ class Trainer:
             for idx, learner in enumerate(self.learner_pop):
                 if learner.fitness is None:
                     learner.fitness = 0
-                learner.fitness = binaryScores[idx]/totalScore
+                learner.fitness += binaryScores[idx]/totalScore
                 normalizedScores.append(binaryScores[idx]/totalScore)
-            collectedScores.append(normalizedScores)
 
             # TODO record number successfully completed tasks
             # successes /= Trainer.NUM_EPISODES_PER_GEN
