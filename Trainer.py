@@ -158,7 +158,7 @@ class Trainer:
             binaryScores = []
             totalScore = 1
             for value in scores:
-                binaryValue = 1 if value >= meanScore else 0
+                binaryValue = 1 if value > meanScore else 0
                 binaryScores.append(binaryValue)
                 totalScore += binaryValue
 
