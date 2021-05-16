@@ -139,6 +139,10 @@ class Trainer:
             self.write_output("{},{},{}\n".format(np.mean(scores),np.max(scores),successes))
 
     def fitnessSharingEvaluation(self):
+        # Reset all fitness to zero
+        for _, learner in enumerate(self.learner_pop):
+            learner.fitness = None
+        
         collectedScores = []
         env = self.env
         for ep in range(Trainer.NUM_EPISODES_PER_GEN):
@@ -161,17 +165,31 @@ class Trainer:
                 binaryValue = 1 if value > meanScore else 0
                 binaryScores.append(binaryValue)
                 totalScore += binaryValue
-
-            normalizedScores = []
+            
             for idx, learner in enumerate(self.learner_pop):
                 if learner.fitness is None:
                     learner.fitness = 0
                 learner.fitness += binaryScores[idx]/totalScore
-                normalizedScores.append(binaryScores[idx]/totalScore)
 
             # TODO record number successfully completed tasks
             # successes /= Trainer.NUM_EPISODES_PER_GEN
 
+#        Post training test
+#        fitnessCollected = []
+#        # Final test round
+#        collectedScores = []
+#        if Trainer.ENV_SEED >= 0:
+#            env.seed(Trainer.ENV_SEED)
+#        state = env.reset()
+#        for _, learner in enumerate(self.learner_pop):
+#            state = env.restart()
+#            score, _ = self.evaluateOnce(learner, state, env)
+#            collectedScores.append(score)
+#            fitnessCollected.append(learner.fitness)
+#        
+#        print("\nAVG FITNESS:", np.mean(fitnessCollected))
+        
+        #return collectedScores, "N/A"
         return np.mean(collectedScores, axis=1), "N/A"
 
     def evaluateOnce(self, learner, state, env):
