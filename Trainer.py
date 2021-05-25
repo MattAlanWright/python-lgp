@@ -22,7 +22,7 @@ def ConfigureTrainer(
         print("Invalid percent_keep {}, must be between 0.1 and 0.9. Setting to 0.3.".format(percent_keep))
         percent_keep = 0.3
         
-    Trainer.NUM_GENERATIONS          = num_generations
+    Trainer.NUM_GENERATIONS         = num_generations
     Trainer.POPULATION_SIZE         = population_size
     Trainer.PERCENT_KEEP            = percent_keep
     Trainer.FAST_MODE               = fast_mode
@@ -34,6 +34,9 @@ def ConfigureTrainer(
     Trainer.OUTPUT_FOLDER           = output_folder
     Trainer.ENV_NAME                = env_name
     Trainer.FITNESS_SHARING         = fitness_sharing
+    Trainer.FITNESS_ALGO            = "fitness_sharing" if fitness_sharing else "canonical"
+    Trainer.UNIQUE_NAME             = str(int(time.time()))+"_"+Trainer.ENV_NAME+"_"+Trainer.FITNESS_ALGO+"_pop_"+str(Trainer.POPULATION_SIZE)+"_k"+str(Trainer.PERCENT_KEEP)
+
 
 class Trainer:
 
@@ -51,6 +54,9 @@ class Trainer:
     ENV_NAME                = "output"
     CURRENT_TIME            = int(time.time())
     FITNESS_SHARING         = False
+    FITNESS_ALGO            = "canonical"
+    UNIQUE_NAME             = str(CURRENT_TIME)
+
 
     def __init__(self, env, test_env = False):
 
@@ -70,11 +76,7 @@ class Trainer:
 
     def write_output(self, content):
         print(content, end="")
-        fitness_algo = "canonical"
-        if (Trainer.FITNESS_SHARING):
-            fitness_algo = "fitness_sharing"
-        name = str(self.CURRENT_TIME)+"_"+self.ENV_NAME+"_"+fitness_algo+"_pop_"+str(Trainer.POPULATION_SIZE)+".csv"
-        with open(self.OUTPUT_FOLDER+name, "a") as output:
+        with open(self.OUTPUT_FOLDER+Trainer.UNIQUE_NAME+".csv", "a") as output:
             output.write(content)
 
     def evolve(self):
@@ -140,8 +142,16 @@ class Trainer:
 
     def fitnessSharingEvaluation(self):
         # Reset all fitness to zero
-        for _, learner in enumerate(self.learner_pop):
-            learner.fitness = None
+        need_evaluation = []
+        pass_evaluation = []
+        while len(self.learner_pop)>0:
+            learner = self.learner_pop.pop()
+            if (learner.fitness != None and learner.num_skips < Trainer.MAX_NUM_SKIPS):
+                learner.num_skips += 1
+                pass_evaluation.append(learner)
+            else:
+                learner.fitness = None
+                need_evaluation.append(learner)
         
         collectedScores = []
         env = self.env
@@ -151,7 +161,7 @@ class Trainer:
             state = env.reset()
             scores = []
             successes = []
-            for _, learner in enumerate(self.learner_pop):
+            for _, learner in enumerate(need_evaluation):
                 state = env.restart()
                 score, success = self.evaluateOnce(learner, state, env)
                 scores.append(score)
@@ -166,30 +176,18 @@ class Trainer:
                 binaryScores.append(binaryValue)
                 totalScore += binaryValue
             
-            for idx, learner in enumerate(self.learner_pop):
+            for idx, learner in enumerate(need_evaluation):
                 if learner.fitness is None:
                     learner.fitness = 0
                 learner.fitness += binaryScores[idx]/totalScore
 
             # TODO record number successfully completed tasks
             # successes /= Trainer.NUM_EPISODES_PER_GEN
-
-#        Post training test
-#        fitnessCollected = []
-#        # Final test round
-#        collectedScores = []
-#        if Trainer.ENV_SEED >= 0:
-#            env.seed(Trainer.ENV_SEED)
-#        state = env.reset()
-#        for _, learner in enumerate(self.learner_pop):
-#            state = env.restart()
-#            score, _ = self.evaluateOnce(learner, state, env)
-#            collectedScores.append(score)
-#            fitnessCollected.append(learner.fitness)
-#        
-#        print("\nAVG FITNESS:", np.mean(fitnessCollected))
         
-        #return collectedScores, "N/A"
+        # Combine learners
+        self.learner_pop.extend(need_evaluation)
+        self.learner_pop.extend(pass_evaluation)
+
         return np.mean(collectedScores, axis=1), "N/A"
 
     def evaluateOnce(self, learner, state, env):
@@ -247,7 +245,10 @@ class Trainer:
         ranked_learners = sorted(self.learner_pop, key=lambda l : l.fitness, reverse=True)
 
         if Trainer.AGENT_SAVE_NAME != "":
-            ranked_learners[0].save(Trainer.AGENT_SAVE_NAME)
+            name = self.OUTPUT_FOLDER+Trainer.AGENT_SAVE_NAME
+            if Trainer.AGENT_SAVE_NAME == "UNIQUE":
+                name = self.OUTPUT_FOLDER+Trainer.UNIQUE_NAME
+            ranked_learners[0].save(name)
 
         num_surviving_learners = int(Trainer.PERCENT_KEEP * Trainer.POPULATION_SIZE)
 

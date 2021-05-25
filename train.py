@@ -53,7 +53,7 @@ def run(arguments):
     # env = gym.make(args.env)
     # Current functioning tasks
     if args.env == "copytask":
-        env = CopyTask(8,8)
+        env = CopyTask(8, [10, 20, 50, 100])
     elif args.env == "tmaze":
         args.statespace = 2
         env = TMaze()

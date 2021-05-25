@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 class CopyTask:
-    def __init__(self, elements = 3, sequences = 5):
+    def __init__(self, elements = 3, sequences = [10, 20, 50, 100]):
         self.elements = elements
         self.sequences = sequences
         self.current_step = 0
@@ -15,7 +15,7 @@ class CopyTask:
     def resetInput(self):
         # Randomize sizes using given numbers as max
         elements = rand.randint(3, self.elements)
-        sequences = rand.randint(3, self.sequences)
+        sequences = self.sequences[rand.randint(0, len(self.sequences)-1)]
     
         # Handle Start/Delimiter
         self.rows = elements+2
