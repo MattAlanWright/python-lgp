@@ -4,6 +4,8 @@ import sys
 import numpy as np
 import time
 import argparse
+import env
+import glob
 sys.path.insert(0, '../')
 
 from Learner import loadLearner
@@ -16,42 +18,50 @@ def run(arguments):
     parser = argparse.ArgumentParser(description='Load a linear PG agent into an environment and render the results.')
     parser.add_argument('--env', dest='env', type=str, help='OpenAI environment', default="CartPole-v1")
     parser.add_argument('--agent', dest='agent_fname', type=str, help='Previously saved Agent', default="")
+    parser.add_argument('--agent_folder', dest='agent_folder', type=str, help='Previously saved Agent(s) multiple in folder', default="")
     parser.add_argument('--seed', dest='seed', type=int, help='Seed for environment', default=-1)
     args = parser.parse_args(arguments)
 
-    if args.agent_fname == "":
+    if args.agent_fname == "" and args.agent_folder == "":
         print("No agent name provide!")
         return
 
-    learner = loadLearner(args.agent_fname)
+    learners = []
+    if (args.agent_fname):
+        learners[0] = loadLearner(args.agent_fname)
+    else:
+        for fname in glob.glob(args.agent_folder):
+            learners.append(loadLearner(fname))
 
-    env = gym.make(args.env)
+    env, args = env.set_env(args)
 
-    if args.seed > -1:
-        env.seed(args.seed)
+    for learner in learners:
+        if args.seed > -1:
+            env.seed(args.seed)
 
-    state = env.reset()
+        state = env.reset()
 
-    score = 0
+        score = 0
 
-    done = False
-    while not done:
-        env.render()
+        done = False
+        while not done:
+            if (env.render()):
+                env.render()
 
-        # Retrieve the Agent's action
-        action = learner.act(state.reshape(-1))
+            # Retrieve the Agent's action
+            action = learner.act(state.reshape(-1))
 
-        # Perform action and get next state
-        state, reward, done, debug = env.step(action)
+            # Perform action and get next state
+            state, reward, done, debug = env.step(action)
 
-        score += reward
+            score += reward
 
-        if done:
-            break
+            if done:
+                break
+            if (env.render()):
+                time.sleep(0.01)
 
-        time.sleep(0.01)
-
-    print("Final score: {}".format(score))
+        print("Final score: {}".format(score))
 
     env.close()
 

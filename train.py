@@ -7,17 +7,12 @@
 #
 # will train a TPG Agent to play CartPole-v1 and save the resulting Agent as 'cp.agent'.
 
-import gym
 import numpy as np
-
-from CopyTask import CopyTask
-from TMaze import TMaze
-from SeqClassing import SeqClassing
-from SeqRecall import SeqRecall
 
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
 
+import env
 import os
 import sys
 import argparse
@@ -49,28 +44,8 @@ def run(arguments):
     parser.add_argument('--statespace', dest='statespace', type=int, help='Length of flattened state space', default=4)
     args = parser.parse_args(arguments)
 
-    # Default CartPole
-    # env = gym.make(args.env)
-    # Current functioning tasks
-    if args.env == "copytask":
-        env = CopyTask(8, [10, 20, 50, 100])
-    elif args.env == "tmaze":
-        args.statespace = 2
-        env = TMaze()
-        test_env = TMaze(100)
-    elif args.env == "seqrecall":
-        env = SeqRecall()
-        args.statespace = 1
-    elif args.env == "seqclass":
-        args.statespace = 1
-        env = SeqClassing()
-    elif args.env == "seqclassconst":
-        args.statespace = 1
-        env = SeqClassing(7)
-    else:
-        print("Please state an environment/task:")
-        print("copytask,tmaze,seqrecall,seqclass,seqclassconst")
-        return
+    # Set env
+    env, args = env.set_env(args)
 
     ConfigureProgram(
         num_inputs      = args.statespace,
