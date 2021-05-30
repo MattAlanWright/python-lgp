@@ -12,7 +12,7 @@ import numpy as np
 from Program import ConfigureProgram
 from Trainer import ConfigureTrainer, Trainer
 
-import env
+from env_helper import *
 import os
 import sys
 import argparse
@@ -45,7 +45,7 @@ def run(arguments):
     args = parser.parse_args(arguments)
 
     # Set env
-    env, args = env.set_env(args)
+    env, args = set_env(args)
 
     ConfigureProgram(
         num_inputs      = args.statespace,

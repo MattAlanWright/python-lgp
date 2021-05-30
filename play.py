@@ -1,11 +1,11 @@
-import gym
 import pickle
 import sys
 import numpy as np
 import time
 import argparse
-import env
+from env_helper import *
 import glob
+from CopyTask import CopyTask
 sys.path.insert(0, '../')
 
 from Learner import loadLearner
@@ -33,37 +33,44 @@ def run(arguments):
         for fname in glob.glob(args.agent_folder):
             learners.append(loadLearner(fname))
 
-    env, args = env.set_env(args)
+    #env, args = set_env(args)
 
-    for learner in learners:
-        if args.seed > -1:
-            env.seed(args.seed)
+    # Run through all sizes
+    for size in [10, 20, 50, 100]:
+        env = CopyTask(8, [size])
+        print(size, end=",")
+        for learner in learners:
+            if args.seed > -1:
+                env.seed(args.seed)
 
-        state = env.reset()
+            state = env.reset()
 
-        score = 0
+            score = 0
 
-        done = False
-        while not done:
-            if (env.render()):
-                env.render()
+            done = False
+            while not done:
+                if ("render" in dir(env)):
+                    env.render()
 
-            # Retrieve the Agent's action
-            action = learner.act(state.reshape(-1))
+                # Retrieve the Agent's action
+                action = learner.act(state.reshape(-1))
 
-            # Perform action and get next state
-            state, reward, done, debug = env.step(action)
+                # Perform action and get next state
+                state, reward, done, debug = env.step(action)
 
-            score += reward
+                score += reward
 
-            if done:
-                break
-            if (env.render()):
-                time.sleep(0.01)
+                if done:
+                    break
+                if ("render" in dir(env)):
+                    time.sleep(0.01)
 
-        print("Final score: {}".format(score))
+            #print("Final score: {}".format(score))
+            print(score, end=",")
+        print("")
 
-    env.close()
+    if ("close" in dir(env)):
+        env.close()
 
 if __name__ == "__main__":
     run(sys.argv[1:])

@@ -4,11 +4,12 @@ from TMaze import TMaze
 from SeqClassing import SeqClassing
 from SeqRecall import SeqRecall
 
-def choose_env(args):
+def set_env(args):
     if args.env == "cartpole":
         env = gym.make(args.env)
     elif args.env == "copytask":
-        env = CopyTask(8, [10, 20, 50, 100])
+        #env = CopyTask(8, [10, 20, 50, 100])
+        env = CopyTask(3, [100])
     elif args.env == "tmaze":
         args.statespace = 2
         env = TMaze()
