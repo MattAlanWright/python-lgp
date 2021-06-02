@@ -29,8 +29,9 @@ class SeqRecall:
     def reset(self):
         self.initCount = fastrand.pcg32bounded(self.count_n)+1
         self.count = self.initCount
+        seq_len = fastrand.pcg32bounded(self.seq_n)+1
         self.input = []
-        for i in range(self.seq_n):
+        for i in range(seq_len):
             # https://stackoverflow.com/a/46820635
             self.input += [1 if random.random() < 0.5 else -1]
         self.input_len = len(self.input)

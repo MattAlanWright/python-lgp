@@ -15,7 +15,7 @@ def set_env(args):
         env = TMaze()
         test_env = TMaze(100)
     elif args.env == "seqrecall":
-        env = SeqRecall()
+        env = SeqRecall(100,6)
         args.statespace = 1
     elif args.env == "seqclass":
         args.statespace = 1
