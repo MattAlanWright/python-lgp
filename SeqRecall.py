@@ -27,9 +27,11 @@ class SeqRecall:
         return np.array([self.input[0], 0])
 
     def reset(self):
-        self.initCount = fastrand.pcg32bounded(self.count_n)+1
+        self.initCount = self.count_n;
+        #self.initCount = fastrand.pcg32bounded(self.count_n)+1
         self.count = self.initCount
-        seq_len = fastrand.pcg32bounded(self.seq_n)+1
+        seq_len = self.seq_n
+        #seq_len = fastrand.pcg32bounded(self.seq_n)+1
         self.input = []
         for i in range(seq_len):
             # https://stackoverflow.com/a/46820635
