@@ -26,8 +26,6 @@ def run(arguments):
         print("No agent name provide!")
         return
 
-    print(args.agent_folder)
-
     learners = []
     if (args.agent_fname):
         learners[0] = loadLearner(args.agent_fname)
@@ -38,9 +36,9 @@ def run(arguments):
     #env, args = set_env(args)
 
     # Run through all sizes
-    for hallwaySize in range(1, 100, 5):
-        env = SeqRecall(hallwaySize, 1)
-        print("Yeah", end=",")
+    for hallwaySize in range(0, 101, 5):
+        env = SeqRecall(hallwaySize, 6)
+        print(hallwaySize, end=",")
         for learner in learners:
             if args.seed > -1:
                 env.seed(args.seed)
