@@ -25,7 +25,7 @@ class SeqClassing:
         # Ability to set constant number of ones
         num_of_ones = self.N
         if (self.N == 0):
-            num_of_ones = fastrand.pcg32bounded(7)+3
+            num_of_ones = fastrand.pcg32bounded(11)+4
         for i in range(num_of_ones):
             # https://stackoverflow.com/a/46820635
             self.input += [1 if random.random() < 0.5 else -1]
