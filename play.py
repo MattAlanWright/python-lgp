@@ -28,7 +28,7 @@ def run(arguments):
 
     learners = []
     if (args.agent_fname):
-        learners[0] = loadLearner(args.agent_fname)
+        learners.append(loadLearner(args.agent_fname))
     else:
         for fname in glob.glob(args.agent_folder):
             learners.append(loadLearner(fname))
