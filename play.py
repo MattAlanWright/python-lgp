@@ -38,10 +38,10 @@ def run(arguments):
     # Run through all sizes
     resultsCollection = []
     for hallwaySize in range(10, 20):
+        results = []
+        results.append(hallwaySize)
         for num_of_ones in range(4, 15):
-            results = []
             env = SeqClassing(num_of_ones, hallwaySize)
-            results.append(hallwaySize)
 
             learner = learners[0]
             if args.seed > -1:
@@ -72,7 +72,7 @@ def run(arguments):
         resultsCollection.append(results)
 
     for results in resultsCollection:
-        print(','.join(results))
+        print(','.join(str(n) for n in results))
 
     if ("close" in dir(env)):
         env.close()
