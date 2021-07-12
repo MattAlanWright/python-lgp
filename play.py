@@ -5,7 +5,7 @@ import time
 import argparse
 from env_helper import *
 import glob
-from SeqRecall import SeqRecall
+from SeqClassing import SeqClassing
 sys.path.insert(0, '../')
 
 from Learner import loadLearner
@@ -36,10 +36,14 @@ def run(arguments):
     #env, args = set_env(args)
 
     # Run through all sizes
-    for hallwaySize in range(0, 101, 5):
-        env = SeqRecall(hallwaySize, 6)
-        print(hallwaySize, end=",")
-        for learner in learners:
+    resultsCollection = []
+    for hallwaySize in range(10, 20):
+        for num_of_ones in range(4, 15):
+            results = []
+            env = SeqClassing(num_of_ones, hallwaySize)
+            results.append(hallwaySize)
+
+            learner = learners[0]
             if args.seed > -1:
                 env.seed(args.seed)
 
@@ -64,10 +68,11 @@ def run(arguments):
                     break
                 if ("render" in dir(env)):
                     time.sleep(0.01)
+            results.append(score)
+        resultsCollection.append(results)
 
-            #print("Final score: {}".format(score))
-            print(score, end=",")
-        print("")
+    for results in resultsCollection:
+        print(','.join(results))
 
     if ("close" in dir(env)):
         env.close()

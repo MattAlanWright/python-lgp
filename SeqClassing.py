@@ -4,9 +4,10 @@ import sys
 import numpy as np
 
 class SeqClassing:
-    def __init__(self, n = 0):
+    def __init__(self, n = 0, gap_size = 0):
         # Set init input
         self.N = n
+        self.gap_size = gap_size
         self.reset()
 
     def seed(self, num):
@@ -29,7 +30,10 @@ class SeqClassing:
         for i in range(num_of_ones):
             # https://stackoverflow.com/a/46820635
             self.input += [1 if random.random() < 0.5 else -1]
-            self.input += [0]*(fastrand.pcg32bounded(10)+10)
+            if (self.gap_size):
+                self.input += [0]*self.gap_size
+            else:
+                self.input += [0]*(fastrand.pcg32bounded(10)+10)
         self.input += [1 if random.random() < 0.5 else -1]
         self.input_len = len(self.input)
         return np.array([self.input[0]])
